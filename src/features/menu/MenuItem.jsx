@@ -5,7 +5,10 @@ function MenuItem({ pizza }) {
 
   return (
     <li>
-      <img src={imageUrl} alt={name} />
+      <img
+        src={imageUrl}
+        alt={name}
+      />
       <div>
         <p>{name}</p>
         <p>{ingredients.join(", ")}</p>
