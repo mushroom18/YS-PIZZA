@@ -1,17 +1,34 @@
-import { useLoaderData } from "react-router-dom";
+import { useFetcher, useLoaderData } from "react-router-dom";
 import { getOrder } from "../../services/apiRestaurant";
-
-// Test ID: IIDSAT
-
 import {
   calcMinutesLeft,
   formatCurrency,
   formatDate,
 } from "../../utils/helpers";
-import OrderItem from "../../../../ultimate-react-course-main/16-fast-react-pizza/final-1-after-tailwind/src/features/order/OrderItem";
+import OrderItem from "./OrderItem";
+import { useEffect, useState } from "react";
+import Loader from "../../ui/Loader";
+// Test ID: IIDSAT
 
 function Order() {
   const order = useLoaderData();
+  const fetcher = useFetcher();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!fetcher.data && fetcher.state === "idle") fetcher.load("/menu");
+  }, [fetcher]);
+
+  useEffect(() => {
+    if (fetcher.data) {
+      console.log("Fetched data:", fetcher.data);
+      setLoading(false);
+    }
+  }, [fetcher.data]);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   const {
     id,
@@ -54,7 +71,15 @@ function Order() {
 
       <ul className="dive-stone-200 divide-y border-b border-t">
         {cart.map((item) => (
-          <OrderItem item={item} key={item.pizzaId} />
+          <OrderItem
+            item={item}
+            key={item.pizzaId}
+            isLoadingIngredients={fetcher.state === "loading"}
+            ingredients={
+              fetcher?.data?.find((el) => el.id === item.pizzaId)
+                ?.ingredients ?? []
+            }
+          />
         ))}
       </ul>
 
